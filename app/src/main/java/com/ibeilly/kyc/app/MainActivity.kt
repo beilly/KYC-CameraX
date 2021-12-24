@@ -1,7 +1,5 @@
-package com.ibeilly.kyc.camerax
+package com.ibeilly.kyc.app
 
-import android.content.Intent
-import android.content.pm.ActivityInfo
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -10,7 +8,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.ibeilly.kyc.camerax.databinding.ActivityMainBinding
+import com.ibeilly.kyc.app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

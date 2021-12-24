@@ -77,7 +77,7 @@ open abstract class BasePreviewActivity : AppCompatActivity() {
 
     protected val outputDirectory: File by lazy {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
-            File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
+            File(it, resources.getString(R.string.kyc_dir)).apply { mkdirs() }
         }
         if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir

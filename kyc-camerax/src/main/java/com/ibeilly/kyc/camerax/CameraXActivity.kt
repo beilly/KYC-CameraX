@@ -1,6 +1,7 @@
 package com.ibeilly.kyc.camerax
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -80,6 +81,13 @@ class CameraXActivity : BasePreviewActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        finishByData(RESULT_CANCELED, Bundle().apply {
+            putString("code", "510")
+            putString("err", "Cancel by user")
+        })
+    }
+
     /**
      * 切换摄像头
      */
@@ -118,13 +126,28 @@ class CameraXActivity : BasePreviewActivity() {
             outputOptions, cameraExecutor, object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                    finishByData(RESULT_OK, Bundle().apply {
+                        putString("code", "500")
+                        putString("msg", "Capture error")
+                    })
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                     Log.d(TAG, "Photo capture succeeded: $savedUri")
+                    finishByData(RESULT_OK, Bundle().apply {
+                        putString("code", "200")
+                        putString("path", savedUri.path)
+                        putString("msg", "Capture success")
+                    })
                 }
             })
+    }
+
+
+    fun finishByData(resultCode: Int, bundle: Bundle) {
+        setResult(resultCode, Intent().putExtras(bundle))
+        finish()
     }
 
     override fun getTargetResolution() =
@@ -168,7 +191,7 @@ class CameraXActivity : BasePreviewActivity() {
          */
         const val CAMERAX_MODEL = "camerax_model"
 
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val FILENAME_FORMAT = "yyyyMMdd-HHmmssSSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
