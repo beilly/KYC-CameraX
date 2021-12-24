@@ -5,7 +5,10 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.Size
 import android.view.View
@@ -18,6 +21,8 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ibeilly.kyc.camerax.databinding.ActivityCameraXactivityBinding
+import com.ibeilly.kyc.kycFail
+import com.ibeilly.kyc.kycSuccess
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -83,7 +88,7 @@ class CameraXActivity : BasePreviewActivity() {
 
     override fun onBackPressed() {
         finishByData(RESULT_CANCELED, Bundle().apply {
-            putString("code", "510")
+            putInt("code", 510)
             putString("err", "Cancel by user")
         })
     }
@@ -126,8 +131,8 @@ class CameraXActivity : BasePreviewActivity() {
             outputOptions, cameraExecutor, object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                    finishByData(RESULT_OK, Bundle().apply {
-                        putString("code", "500")
+                    finishByData(RESULT_CANCELED, Bundle().apply {
+                        putInt("code", 500)
                         putString("msg", "Capture error")
                     })
                 }
@@ -135,8 +140,9 @@ class CameraXActivity : BasePreviewActivity() {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                     Log.d(TAG, "Photo capture succeeded: $savedUri")
+
                     finishByData(RESULT_OK, Bundle().apply {
-                        putString("code", "200")
+                        putInt("code", 200)
                         putString("path", savedUri.path)
                         putString("msg", "Capture success")
                     })
@@ -144,10 +150,25 @@ class CameraXActivity : BasePreviewActivity() {
             })
     }
 
+    private val uiHandler = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        Handler.createAsync(Looper.getMainLooper()) {
+            return@createAsync true
+        }
+    } else {
+        Handler()
+    }
 
     fun finishByData(resultCode: Int, bundle: Bundle) {
-        setResult(resultCode, Intent().putExtras(bundle))
-        finish()
+        uiHandler.postAtFrontOfQueue {
+            val path = bundle.getString("path")
+            if (resultCode == RESULT_OK && null != path) {
+                kycSuccess?.invoke(path, "")
+            } else {
+                kycFail?.invoke(bundle.getInt("code"), bundle.getString("msg") ?: "Unknown error")
+            }
+            setResult(resultCode, Intent().putExtras(bundle))
+            finish()
+        }
     }
 
     override fun getTargetResolution() =
@@ -180,7 +201,7 @@ class CameraXActivity : BasePreviewActivity() {
                     "Permissions not granted by the user.",
                     Toast.LENGTH_SHORT
                 ).show()
-                finish()
+                onBackPressed()
             }
         }
     }

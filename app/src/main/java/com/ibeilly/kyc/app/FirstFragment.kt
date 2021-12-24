@@ -1,16 +1,17 @@
 package com.ibeilly.kyc.app
 
-import android.app.Activity
-import android.content.Intent
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.ibeilly.kyc.*
 import com.ibeilly.kyc.app.databinding.FragmentFirstBinding
-import com.ibeilly.kyc.camerax.CameraXActivity
 
 
 /**
@@ -42,68 +43,73 @@ class FirstFragment : Fragment() {
         }
 
         binding.buttonFace.setOnClickListener {
-            startActivityForResult(
-                Intent(
-                    this@FirstFragment.requireActivity(),
-                    CameraXActivity::class.java
-                ).putExtra(
-                    CameraXActivity.CAMERAX_MODEL,
-                    0
-                ), 100
-            )
+            startWithPermissionCheck(100)
         }
 
         binding.buttonAdd.setOnClickListener {
-            startActivityForResult(
-                Intent(
-                    this@FirstFragment.requireActivity(),
-                    CameraXActivity::class.java
-                ).putExtra(
-                    CameraXActivity.CAMERAX_MODEL,
-                    1
-                ), 101
-            )
+            startWithPermissionCheck(101)
         }
 
         binding.buttonPan.setOnClickListener {
-            startActivityForResult(
-                Intent(
-                    this@FirstFragment.requireActivity(),
-                    CameraXActivity::class.java
-                ).putExtra(
-                    CameraXActivity.CAMERAX_MODEL,
-                    2
-                ), 102
+            startWithPermissionCheck(102)
+        }
+    }
+
+    private fun getSuccessCall(tag: String): KYCDetectSuccess {
+        return { path, _ ->
+            Toast.makeText(context, "[$tag] => $path", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun getFailCall(tag: String): KYCDetectFail {
+        return { code, msg ->
+            Toast.makeText(context, "[$tag] => $code: $msg", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun startWithPermissionCheck(code: Int) {
+        // Request camera permissions
+        if (allPermissionsGranted()) {
+            when (code) {
+                100 -> startFace(getSuccessCall("face"), getFailCall("face"))
+                101 -> startADD(getSuccessCall("add"), getFailCall("add"))
+                102 -> startPAN(getSuccessCall("pan"), getFailCall("pan"))
+            }
+        } else {
+            requestPermissions(
+                REQUIRED_PERMISSIONS, code
             )
         }
     }
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(
+            requireActivity(), it
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>, grantResults:
+        IntArray
+    ) {
+        if (requestCode in arrayListOf(100, 101, 102)) {
+            if (allPermissionsGranted()) {
+                startWithPermissionCheck(requestCode)
+            } else {
+                Toast.makeText(
+                    context,
+                    "Permissions not granted by the user.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (100 == requestCode) {
-            if (Activity.RESULT_OK == resultCode && data?.getStringExtra("code") == "200") {
-                Toast.makeText(context, data?.getStringExtra("path"), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, data?.getStringExtra("msg"), Toast.LENGTH_SHORT).show()
-            }
-        } else if (101 == requestCode) {
-            if (Activity.RESULT_OK == resultCode && data?.getStringExtra("code") == "200") {
-                Toast.makeText(context, data?.getStringExtra("path"), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, data?.getStringExtra("msg"), Toast.LENGTH_SHORT).show()
-            }
-        } else if (102 == requestCode) {
-            if (Activity.RESULT_OK == resultCode && data?.getStringExtra("code") == "200") {
-                Toast.makeText(context, data?.getStringExtra("path"), Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, data?.getStringExtra("msg"), Toast.LENGTH_SHORT).show()
-            }
-        }
-
-        super.onActivityResult(requestCode, resultCode, data)
-    }
 }
