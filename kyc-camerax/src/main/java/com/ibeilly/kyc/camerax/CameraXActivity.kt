@@ -29,10 +29,11 @@ import java.util.*
 
 
 class CameraXActivity : BasePreviewActivity() {
+    protected lateinit var binding: ActivityCameraXactivityBinding
+    protected lateinit var cameraXOption: CameraXOption
+
 
     protected lateinit var previewView: PreviewView
-    protected lateinit var switchCamera: View
-    protected lateinit var bgMask: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +41,9 @@ class CameraXActivity : BasePreviewActivity() {
         bindView()
 
         Log.d(TAG, "onCreate $requestedOrientation")
-        if (null == savedInstanceState) {
-            initWithCameraXOption()
-        }
+
+        initWithCameraXOption(savedInstanceState)
+
 
         // Request camera permissions
         if (allPermissionsGranted()) {
@@ -54,25 +55,29 @@ class CameraXActivity : BasePreviewActivity() {
         }
     }
 
-    private fun initWithCameraXOption() {
+    private fun initWithCameraXOption(savedInstanceState: Bundle?) {
         val cameraxModel = intent.getIntExtra(CAMERAX_MODEL, CameraXOption.FACE.ordinal)
-        val cameraXOption =
+        cameraXOption =
             CameraXOption.values().elementAtOrElse(cameraxModel) { i -> CameraXOption.FACE }
+
+        if (null == savedInstanceState) {
+            lensFacing =
+                if (cameraXOption.defaultBackCamera) CameraSelector.LENS_FACING_BACK else CameraSelector.LENS_FACING_FRONT
+        }
 
         requestedOrientation =
             if (cameraXOption.requestedOrientation) ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        switchCamera.visibility = if (cameraXOption.switchCamera) View.VISIBLE else View.GONE
-        lensFacing =
-            if (cameraXOption.defaultBackCamera) CameraSelector.LENS_FACING_BACK else CameraSelector.LENS_FACING_FRONT
-        bgMask.visibility = if (cameraXOption.showMask) View.VISIBLE else View.GONE
+        binding.switchCamera.visibility = if (cameraXOption.switchCamera) View.VISIBLE else View.GONE
+
+        binding.bgMask.visibility = if (cameraXOption.showMask) View.VISIBLE else View.GONE
+        binding.bottomTips?.visibility = if (cameraXOption.showMask) View.VISIBLE else View.GONE
+        binding.topTips?.visibility = if (cameraXOption.showMask) View.VISIBLE else View.GONE
     }
 
     open fun bindView(): Unit {
-        val binding = ActivityCameraXactivityBinding.inflate(layoutInflater)
+        binding = ActivityCameraXactivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
         previewView = binding.previewView
-        switchCamera = binding.switchCamera
-        bgMask = binding.bgMask
 
         binding.back.setOnClickListener {
             onBackPressed()

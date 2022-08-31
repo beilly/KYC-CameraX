@@ -24,8 +24,8 @@
         <ImageView
             android:id="@+id/left"
             android:layout_width="24dp"
-            android:layout_height="220dp"
-            android:layout_marginBottom="220dp"
+            android:layout_height="240dp"
+            android:layout_marginBottom="160dp"
             android:background="@color/gray"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -59,6 +59,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/ll_title"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:padding="12dp"
@@ -74,6 +75,16 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textColor="@android:color/white"
+            app:layout_constraintLeft_toRightOf="@id/back"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Doc Capture"/>
+
         <ImageView
             android:id="@+id/switch_camera"
             android:layout_width="42dp"
@@ -83,8 +94,21 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <TextView
+        android:id="@+id/top_tips"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/ll_title"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="Please place the card inside the box and make sure the image is clear and glare free"/>
 
 
     <ImageView
@@ -96,5 +120,38 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/bottom_tips"
+        app:layout_constraintBottom_toTopOf="@id/take_picture"
+        android:layout_marginBottom="48dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="66dp"
+            android:layout_height="44dp"
+            android:src="@mipmap/icon_camera_page_card_sample_back_one"/>
+
+        <ImageView
+            android:layout_width="66dp"
+            android:layout_height="44dp"
+            android:layout_marginLeft="10dp"
+            android:src="@mipmap/icon_camera_page_card_sample_back_two"/>
+
+        <ImageView
+            android:layout_width="66dp"
+            android:layout_height="44dp"
+            android:layout_marginLeft="10dp"
+            android:src="@mipmap/icon_camera_page_card_sample_back_three"/>
+
+        <ImageView
+            android:layout_width="66dp"
+            android:layout_height="44dp"
+            android:layout_marginLeft="10dp"
+            android:src="@mipmap/icon_camera_page_card_sample_back_four"/>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
