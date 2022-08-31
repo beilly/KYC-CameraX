@@ -113,8 +113,8 @@
 
     <ImageView
         android:id="@+id/take_picture"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="58dp"
+        android:layout_height="58dp"
         android:layout_marginBottom="48dp"
         android:src="@mipmap/icon_camera_page_take_photo_button"
         app:layout_constraintBottom_toBottomOf="parent"

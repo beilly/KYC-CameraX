@@ -1,3 +1,4 @@
 <resources>
     <string name="kyc_dir">KYC-CameraX</string>
+    <string name="kyc_bottom_tips">La foto de tu lNE/FE debe quedar dentro del cuadro</string>
 </resources>
